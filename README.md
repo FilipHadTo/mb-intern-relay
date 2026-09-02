@@ -3,6 +3,8 @@
 Odtworzenie ekranu **Zgłoszenia** z konsoli wsparcia RELAY w czystym HTML, CSS
 i JavaScripcie — bez frameworków, bez build stepu, bez zależności.
 
+**Podgląd na żywo:** https://filiphadto.github.io/mb-intern-relay/
+
 Design źródłowy:
 [Figma — Rekrutacja Intern 2026](https://www.figma.com/design/qbIgUonueUNZq5hxjCtQE7/Rekrutacja-Intern-2026?node-id=15-2)
 
