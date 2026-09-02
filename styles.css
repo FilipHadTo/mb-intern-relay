@@ -67,7 +67,7 @@
    [hidden] { display: none } — without this they never actually hide. */
 [hidden] { display: none !important; }
 
-html { background: #dedede; }
+html { background: var(--c-page); }
 
 body {
   margin: 0;
@@ -89,9 +89,13 @@ a:hover { text-decoration: underline; }
   overflow: hidden; white-space: nowrap;
 }
 
-/* The original screen is a fixed 1280px intranet layout. Keeping it fixed is
-   more faithful than making a 2005 console responsive. */
-.app { width: 1280px; margin: 0 auto; background: var(--c-page); }
+/* The console fills the window like the intranet app it imitates. The content
+   column is capped at the design's 1080px, so at >=1280px wide the layout is
+   pixel-identical to the Figma reference; below that it adapts. */
+.app { width: 100%; background: var(--c-page); }
+
+/* Design width of the content column: 620 grid + 16 gap + 444 detail. */
+.filters, .panels, .dash { max-width: 1080px; }
 
 /* ============================================================== topbar */
 
@@ -119,7 +123,7 @@ a:hover { text-decoration: underline; }
 
 /* ============================================================== shell */
 
-.shell { display: flex; align-items: stretch; min-height: 776px; }
+.shell { display: flex; align-items: stretch; min-height: calc(100vh - 44px); }
 
 .sidebar {
   flex: 0 0 168px;
@@ -176,7 +180,6 @@ a:hover { text-decoration: underline; }
   background: var(--c-toolbar);
   border: 1px solid var(--c-border-bar);
   margin: 0 0 12px;
-  width: 1080px;
 }
 
 .field { display: flex; flex-direction: column; gap: 2px; }
@@ -193,6 +196,11 @@ a:hover { text-decoration: underline; }
   border-radius: 0;
 }
 .filters input::placeholder { color: #a5a5a5; }
+
+#f-status   { width: 122px; }
+#f-priority { width: 100px; }
+#f-queue    { width: 146px; }
+#f-q        { width: 240px; }
 
 .filters__hint {
   margin-left: 2px;
@@ -236,7 +244,7 @@ a:hover { text-decoration: underline; }
 
 .panels {
   display: grid;
-  grid-template-columns: 620px 444px;
+  grid-template-columns: minmax(0, 1fr) 444px;
   gap: 16px;
   align-items: start;
 }
@@ -250,6 +258,20 @@ a:hover { text-decoration: underline; }
 /* --------------------------------------------------------- tickets grid */
 
 .grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+/* Columns whose content has a fixed size get a fixed width; "Temat" is left
+   auto so it absorbs whatever is left over. Percentages were wrong here - a
+   four-digit ID needs ~41px whatever the table width, so a percentage clipped
+   it on narrow screens.
+   Widths are derived from measured text (longest real value + 12px padding),
+   each with a small margin. Sum = 380, so at the design's 618px content box
+   "Temat" resolves to 238px - the 236px from Figma, plus slack. */
+.grid th:nth-child(1) { width: 42px; }  /* ID:        "4464"           29 */
+                                        /* Temat:     auto, needs     223 */
+.grid th:nth-child(3) { width: 114px; } /* Klient:    "Kowalscy sp..." 100 */
+.grid th:nth-child(4) { width: 60px; }  /* Status:    header            46 */
+.grid th:nth-child(5) { width: 72px; }  /* Priorytet: header + arrow    59 */
+.grid th:nth-child(6) { width: 92px; }  /* Termin:    "wczoraj 00:00"   78 */
 
 .grid thead th {
   height: 27px;
@@ -278,7 +300,7 @@ a:hover { text-decoration: underline; }
 }
 .grid thead button:hover { background: #cfdae5; }
 
-.grid__arrow { font-size: 8px; color: #5a7690; }
+.grid__arrow { flex: 0 0 8px; font-size: 8px; color: #5a7690; text-align: center; }
 .grid thead th[aria-sort="ascending"]  .grid__arrow::before { content: '▲'; }
 .grid thead th[aria-sort="descending"] .grid__arrow::before { content: '▼'; }
 
@@ -389,6 +411,7 @@ a:hover { text-decoration: underline; }
 /* =========================================================== detail panel */
 
 .panel--detail { min-height: 430px; }
+.panels > .panel--detail { width: auto; }
 
 .panel__head {
   display: flex;
@@ -518,7 +541,7 @@ a:hover { text-decoration: underline; }
 
 /* ============================================================== dashboard */
 
-.dash { display: grid; grid-template-columns: repeat(4, 174px); gap: 12px; width: 1080px; }
+.dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 
 .tile { padding: 9px 10px; background: var(--c-surface); border: 1px solid var(--c-border); }
 .tile__label { margin: 0 0 6px; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; color: var(--c-label-sm); }
@@ -533,7 +556,7 @@ a:hover { text-decoration: underline; }
 /* ================================================================== stub */
 
 .stub {
-  width: 620px;
+  max-width: 620px;
   padding: 22px 20px;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -639,13 +662,85 @@ a:hover { text-decoration: underline; }
 /* ============================================================ logged out */
 
 .signout {
-  width: 1280px;
   margin: 0 auto;
   padding: 150px 0;
   text-align: center;
 }
 .signout h1 { margin: 0 0 10px; font-size: 18px; color: var(--c-heading); }
 .signout p  { margin: 0 0 18px; color: var(--c-muted); }
+
+/* ============================================================ responsive
+
+   The reference layout needs 168 (sidebar) + 16 + 1080 + 16 = 1280px. Above
+   that nothing changes, so the Figma comparison stays exact. Below it the
+   console degrades in four steps rather than forcing a horizontal scrollbar.
+   -------------------------------------------------------------------------- */
+
+/* 1. Detail panel no longer fits beside the grid -> stack them. */
+@media (max-width: 1279px) {
+  .panels { grid-template-columns: minmax(0, 1fr); }
+  .panel--detail { min-height: 0; }
+}
+
+/* 2. Sidebar becomes a horizontal nav strip under the topbar. */
+@media (max-width: 899px) {
+  .shell { flex-direction: column; min-height: 0; }
+
+  .sidebar {
+    display: flex;
+    flex: 0 0 auto;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--c-border-side);
+  }
+  .sidebar__item {
+    flex: 0 0 auto;
+    padding: 9px 13px 0;
+    border-bottom: 0;
+    border-right: 1px solid var(--c-border-nav);
+    white-space: nowrap;
+  }
+  .sidebar__item.is-active { box-shadow: inset 0 -2px 0 var(--c-topbar-a); }
+}
+
+/* 3. Phones and small tablets: the filter bar wraps, and the two columns the
+      detail panel already repeats (Klient, Priorytet) leave the grid. */
+@media (max-width: 767px) {
+  .content { padding: 10px 10px 14px; }
+
+  .filters { height: auto; flex-wrap: wrap; gap: 8px 10px; padding: 8px 9px; }
+  #f-status, #f-priority, #f-queue { width: auto; min-width: 96px; flex: 1 1 30%; }
+  .field { flex: 1 1 30%; }
+  .field--search, #f-q { width: 100%; flex: 1 1 100%; }
+  .filters__hint { padding-bottom: 0; flex: 1 1 100%; }
+
+  .grid th:nth-child(3), .grid td:nth-child(3),
+  .grid th:nth-child(5), .grid td:nth-child(5) { display: none; }
+
+  .grid th:nth-child(4) { width: 114px; }
+
+  .pager { height: auto; flex-wrap: wrap; gap: 6px; padding: 7px 10px; }
+  .pager__size { margin-left: 0; }
+
+  .meta { grid-template-columns: 76px minmax(0, 1fr); }
+  .thread { max-height: 200px; }
+  .modal__window { width: auto; margin: 0 12px; }
+  .toasts { right: 10px; bottom: 10px; }
+  .toast { width: auto; max-width: calc(100vw - 20px); }
+}
+
+/* 4. Narrow phones: ID, subject and status only. */
+@media (max-width: 479px) {
+  .topbar { padding: 0 10px; }
+  .topbar__version { display: none; }
+
+  .grid th:nth-child(6), .grid td:nth-child(6) { display: none; }
+
+  .pagehead { flex-wrap: wrap; gap: 2px 8px; }
+  .history li { grid-template-columns: 38px minmax(0, 1fr); }
+  .history li > :last-child { display: none; }
+  .panel__buttons { flex-wrap: wrap; }
+}
 
 /* ================================================================= print */
 

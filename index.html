@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=1280">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RELAY — Konsola Wsparcia v2.4.1</title>
 <meta name="description" content="RELAY Support Console — odtworzenie ekranu Zgłoszeń w czystym HTML/CSS/JS.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%234a6a8d'/><text x='16' y='23' font-family='Arial' font-size='20' font-weight='bold' fill='%23fff' text-anchor='middle'>R</text></svg>">
@@ -61,23 +61,23 @@
         <form class="filters" id="filters" autocomplete="off">
           <div class="field">
             <label for="f-status">Status</label>
-            <select id="f-status" name="status" style="width:122px">
+            <select id="f-status" name="status">
               <option value="">wszystkie</option>
             </select>
           </div>
           <div class="field">
             <label for="f-priority">Priorytet</label>
-            <select id="f-priority" name="priority" style="width:100px">
+            <select id="f-priority" name="priority">
               <option value="">wszystkie</option>
             </select>
           </div>
           <div class="field">
             <label for="f-queue">Kolejka</label>
-            <select id="f-queue" name="queue" style="width:146px"></select>
+            <select id="f-queue" name="queue"></select>
           </div>
-          <div class="field">
+          <div class="field field--search">
             <label class="sr-only" for="f-q">Szukaj w treści zgłoszeń</label>
-            <input type="text" id="f-q" name="q" style="width:240px" placeholder="Szukaj w treści zgłoszeń...">
+            <input type="text" id="f-q" name="q" placeholder="Szukaj w treści zgłoszeń...">
           </div>
           <button type="submit" class="btn btn--primary" id="btn-filter">Filtruj</button>
           <button type="reset" class="btn" id="btn-reset">Wyczyść</button>
@@ -89,14 +89,6 @@
           <!-- ------------------------------------------- tickets grid -->
           <section class="panel panel--grid" aria-label="Tabela zgłoszeń">
             <table class="grid" id="grid">
-              <colgroup>
-                <col style="width:42px">
-                <col style="width:236px">
-                <col style="width:114px">
-                <col style="width:81px">
-                <col style="width:62px">
-                <col style="width:85px">
-              </colgroup>
               <thead>
                 <tr>
                   <th scope="col" aria-sort="descending"><button type="button" data-sort="id">ID<span class="grid__arrow"></span></button></th>

@@ -787,6 +787,8 @@
 
     var pick = function (arr) { return arr[Math.floor(Math.random() * arr.length)]; };
     var client = pick(DATA.clients);
+    // Nordisk AB's history is part of the design reference — leave it alone.
+    while (client === 'Nordisk AB') client = pick(DATA.clients);
     var name = pick(DATA.firstNames) + ' ' + pick(DATA.lastNames);
     var maxId = DATA.tickets.reduce(function (m, t) { return Math.max(m, t.id); }, 0);
     var created = now();
@@ -822,18 +824,18 @@
     DATA.tickets.unshift(ticket);
     ticketIndex[ticket.id] = ticket;
     state.inbox.push(ticket.id);
-    state.flash.push(ticket.id);
 
-    // Only pull it straight into view when the operator is looking at the top
-    // of the default listing — otherwise just flag it in the header.
-    var atTop = state.page === 1 && state.sort.key === 'id' && state.sort.dir === 'desc';
-    if (atTop && matches(ticket, state.applied)) render();
-    else renderInbox();
+    // Never inject into the visible page: rows must not shift under the
+    // operator's cursor, and the default view has to keep matching the design
+    // reference. The badge invites an explicit refresh instead.
+    renderInbox();
 
     toast('Nowe zgłoszenie <b>#' + ticket.id + '</b> w kolejce: ' + esc(ticket.subject), 'warn');
   }
 
   function refreshInbox() {
+    // Highlight exactly what arrived since the last refresh.
+    state.flash = state.inbox.slice();
     state.inbox = [];
     state.page = 1;
     state.sort = { key: 'id', dir: 'desc' };

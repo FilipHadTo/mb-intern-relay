@@ -32,14 +32,14 @@ window.RELAY_DATA = (function () {
   var CLIENTS = [
     'Nordisk AB', 'Kowalscy sp. z o.o.', 'Trendlab', 'Mikrus S.A.', 'Piekarnia Zorza',
     'Helios Group', 'osoba prywatna', 'Vektor Media', 'Stalprod sp.j.', 'Nowak Consulting',
-    'Bio-Farm S.A.', 'Lumen Studio', 'Kompas Logistyka', 'Delta Serwis', 'Arkadia Nieruchomości',
+    'Bio-Farm S.A.', 'Lumen Studio', 'Kompas Logistyka', 'Delta Serwis', 'Arkadia Dom',
     'Fabryka Słów', 'Meblex', 'PolTrans', 'Aurora Dent', 'Cyfrowy Mostek',
-    'Zielony Rynek', 'Termika S.A.', 'Wektor Plus', 'Studio Kadr', 'Kancelaria Wiśniewski',
+    'Zielony Rynek', 'Termika S.A.', 'Wektor Plus', 'Studio Kadr', 'Kancelaria Wiśn.',
     'Bałtyk Marine', 'Solaris Energia', 'Karpaty Tour', 'InfoSprzęt', 'Pralnia Duet',
-    'Optyk Horyzont', 'Krzemowa Dolina sp. z o.o.', 'Marka Własna', 'Hurt-Bud', 'Legion Ochrona',
+    'Optyk Horyzont', 'Krzemowa Dolina', 'Marka Własna', 'Hurt-Bud', 'Legion Ochrona',
     'Apteka Pod Wagą', 'Sadex', 'Rowery Wichura', 'Foto Atelier', 'Klinika Vita',
     'Mostostal Nord', 'e-Papier', 'Kawiarnia Ziarno', 'Fitness Puls', 'Autoserwis Bąk',
-    'Drukarnia Offsetowa', 'Chmura IT sp. z o.o.', 'Tekstylia Wisła', 'Geodezja Punkt', 'Serwis Kotłów Grzejnik'
+    'Drukarnia Nord', 'Chmura IT', 'Tekstylia Wisła', 'Geodezja Punkt', 'Serwis Grzejnik'
   ];
 
   var SUBJECTS = [

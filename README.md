@@ -60,8 +60,10 @@ Nie ma tu klikanego mockupu — wszystko liczy się z danych w `data.js`.
 - **Licznik SLA** tyka co sekundę. Kolumna „Termin” i pole w panelu
   przeliczają się na żywo, a przekroczony termin zmienia kolor.
 - **Nowe zgłoszenia** dochodzą do kolejki co 20 sekund (można wyłączyć w
-  Ustawieniach). Jeśli jesteś na pierwszej stronie, wiersz wjeżdża z
-  podświetleniem; jeśli nie — dostajesz licznik w nagłówku.
+  Ustawieniach). Nie wskakują do widoku — pojawia się plakietka w nagłówku, a
+  wiersze wjeżdżają z podświetleniem dopiero po kliknięciu odświeżenia listy.
+  Celowo: wiersze nie mogą przesuwać się pod kursorem, a widok domyślny ma
+  pozostać zgodny z designem.
 - **Pulpit** liczy kafelki (nowe / w toku / eskalacje / przekroczone SLA)
   z tej samej bazy.
 - **Ustawienia** (auto-odświeżanie, licznik SLA, wiersze na stronę) zapisują
@@ -96,19 +98,47 @@ Dwie rzeczy warto znać, jeśli będziesz to zmieniać:
   który płynie w czasie realnym. Dzięki temu daty z designu mają sens, a
   liczniki SLA i tak tykają. Zmiana jednej stałej przestawia cały ekran.
 
+Sześć wymyślonych nazw klientów skróciłem (np. Krzemowa Dolina sp. z o.o. ->
+Krzemowa Dolina), bo były dłuższe niż cokolwiek, pod co design wymierzył
+kolumnę Klient — a nie było już budżetu, żeby ją poszerzyć bez obcinania
+tematu.
+
 Status zgłoszenia zależy od jego wieku — stary backlog jest w większości
 zamknięty. Losowanie statusu bez tej korelacji dawało ponad tysiąc
 przekroczonych SLA, co wyglądało nieprawdziwie.
+
+## Responsywność
+
+Oryginał to fixed-width intranet, ale ekran nie jest desktop-only:
+
+- **>=1280 px** — layout referencyjny, piksel w piksel jak w Figmie.
+- **<1280 px** — panel szczegółów schodzi pod tabelę, tabela rośnie na
+  dostępną szerokość.
+- **<900 px** — sidebar zamienia się w poziomy pasek nawigacji.
+- **<768 px** — filtry zawijają się w kilka rzędów, a kolumny Klient i
+  Priorytet schodzą z tabeli (te dane są w panelu szczegółów).
+- **<480 px** — zostają ID, Temat i Status.
+
+Nigdzie nie ma poziomego scrolla.
+
+Szerokości kolumn nie są procentowe. Kolumny o zawartości stałej wielkości
+(ID, Klient, Status, Priorytet, Termin) mają szerokość w pikselach, a Temat
+jest `auto` i wchłania resztę. Procenty tu nie działają: czterocyfrowe ID
+potrzebuje ~41 px niezależnie od szerokości tabeli, więc na wąskim ekranie
+procentowa kolumna je ucinała.
 
 ## Odstępstwa od designu (świadome)
 
 1. **Odmiana liczebnika.** Design ma „1 284 rekordów”; poprawna forma dla
    liczby kończącej się na 4 to „1 284 rekordy”, więc kod odmienia rzeczownik
    regułą (`plural()` w `app.js`), bo licznik i tak zmienia się dynamicznie.
-2. **Szerokości kolumn** to 42 / 236 / 114 / 81 / 62 / 85 px zamiast
-   42 / 236 / 108 / 82 / 62 / 90. Suma nadal wynosi 620 px. W Figmie teksty
-   wychodzą poza swoje ramki, czego tabela HTML nie robi — przy oryginalnych
-   szerokościach „Kowalscy sp. z o.o.” obcinało się wielokropkiem.
+2. **Szerokości kolumn** to 42 / 238 / 114 / 60 / 72 / 92 px zamiast
+   42 / 236 / 108 / 82 / 62 / 90; suma przy szerokości referencyjnej nadal
+   wynosi 620 px. W Figmie teksty wychodzą poza swoje ramki, czego tabela HTML
+   nie robi — przy oryginalnych szerokościach obcinała się nazwa klienta, a
+   nagłówek Priorytet gubił strzałkę sortowania. Każda szerokość wynika ze
+   zmierzonej najdłuższej realnej wartości plus margines, a nadwyżkę oddaje
+   Status, czyli jedyna kolumna, którą i design obcina.
 3. **Strzałki sortowania** w nagłówkach — potrzebne, skoro sortowanie działa.
 4. **„Historia klienta (3 z 44)”** zamiast „(3 z 37)”. Liczba jest wyliczana
    z bazy, nie wpisana.
@@ -120,5 +150,3 @@ Cała paleta i typografia siedzą w bloku `:root` w `styles.css` — redesign
 można zacząć od podmiany samych zmiennych, bez ruszania struktury. Logika w
 `app.js` jest podzielona na sekcje (zegar, formatery, stan, zapytania,
 renderery, obsługa zdarzeń) i nie zależy od konkretnego wyglądu.
-
-Ekran ma stałą szerokość 1280 px, tak jak oryginał.
