@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1280">
+<title>RELAY — Konsola Wsparcia v2.4.1</title>
+<meta name="description" content="RELAY Support Console — odtworzenie ekranu Zgłoszeń w czystym HTML/CSS/JS.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%234a6a8d'/><text x='16' y='23' font-family='Arial' font-size='20' font-weight='bold' fill='%23fff' text-anchor='middle'>R</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============================================================ topbar -->
+  <header class="topbar">
+    <span class="topbar__brand">RELAY</span>
+    <span class="topbar__version">Support Console v2.4.1</span>
+    <nav class="topbar__account" aria-label="Konto">
+      <span class="topbar__user">k.nowak</span>
+      <span class="topbar__sep" aria-hidden="true">|</span>
+      <a href="#" data-action="settings">Ustawienia</a>
+      <span class="topbar__sep" aria-hidden="true">|</span>
+      <a href="#" data-action="logout">Wyloguj</a>
+    </nav>
+  </header>
+
+  <div class="shell">
+
+    <!-- ========================================================= sidebar -->
+    <nav class="sidebar" aria-label="Menu główne">
+      <a class="sidebar__item" href="#" data-module="pulpit">Pulpit</a>
+      <a class="sidebar__item is-active" href="#" data-module="zgloszenia" aria-current="page">Zgłoszenia</a>
+      <a class="sidebar__item" href="#" data-module="klienci">Klienci</a>
+      <a class="sidebar__item" href="#" data-module="baza">Baza wiedzy</a>
+      <a class="sidebar__item" href="#" data-module="raporty">Raporty</a>
+    </nav>
+
+    <main class="content">
+
+      <!-- ============================================ module: Zgłoszenia -->
+      <section class="module" id="module-zgloszenia">
+
+        <p class="breadcrumb">
+          <a href="#" data-module="pulpit">Pulpit</a>
+          <span aria-hidden="true">&gt;</span>
+          <span>Zgłoszenia</span>
+        </p>
+
+        <div class="pagehead">
+          <h1>Zgłoszenia</h1>
+          <p class="pagehead__meta" id="record-count" aria-live="polite"></p>
+          <a class="pagehead__inbox" id="new-badge" href="#" hidden></a>
+        </div>
+
+        <!-- filters: nothing is applied until "Filtruj" is pressed, exactly
+             like the server round-trip this screen was originally built for -->
+        <form class="filters" id="filters" autocomplete="off">
+          <div class="field">
+            <label for="f-status">Status</label>
+            <select id="f-status" name="status" style="width:122px">
+              <option value="">wszystkie</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-priority">Priorytet</label>
+            <select id="f-priority" name="priority" style="width:100px">
+              <option value="">wszystkie</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="f-queue">Kolejka</label>
+            <select id="f-queue" name="queue" style="width:146px"></select>
+          </div>
+          <div class="field">
+            <label class="sr-only" for="f-q">Szukaj w treści zgłoszeń</label>
+            <input type="text" id="f-q" name="q" style="width:240px" placeholder="Szukaj w treści zgłoszeń...">
+          </div>
+          <button type="submit" class="btn btn--primary" id="btn-filter">Filtruj</button>
+          <button type="reset" class="btn" id="btn-reset">Wyczyść</button>
+          <span class="filters__hint" id="filters-hint" hidden>zmieniono kryteria — kliknij „Filtruj”</span>
+        </form>
+
+        <div class="panels">
+
+          <!-- ------------------------------------------- tickets grid -->
+          <section class="panel panel--grid" aria-label="Tabela zgłoszeń">
+            <table class="grid" id="grid">
+              <colgroup>
+                <col style="width:42px">
+                <col style="width:236px">
+                <col style="width:114px">
+                <col style="width:81px">
+                <col style="width:62px">
+                <col style="width:85px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th scope="col" aria-sort="descending"><button type="button" data-sort="id">ID<span class="grid__arrow"></span></button></th>
+                  <th scope="col"><button type="button" data-sort="subject">Temat zgłoszenia<span class="grid__arrow"></span></button></th>
+                  <th scope="col"><button type="button" data-sort="client">Klient<span class="grid__arrow"></span></button></th>
+                  <th scope="col"><button type="button" data-sort="status">Status<span class="grid__arrow"></span></button></th>
+                  <th scope="col"><button type="button" data-sort="priority">Priorytet<span class="grid__arrow"></span></button></th>
+                  <th scope="col"><button type="button" data-sort="due">Termin<span class="grid__arrow"></span></button></th>
+                </tr>
+              </thead>
+              <tbody id="grid-body" tabindex="0"></tbody>
+            </table>
+
+            <div class="pager">
+              <div class="pager__pages" id="pager"></div>
+              <label class="pager__size">Pokaż:
+                <select id="page-size">
+                  <option>10</option>
+                  <option>25</option>
+                  <option>50</option>
+                  <option>100</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="loader" id="loader" hidden>
+              <div class="loader__box">
+                <p>Ładowanie danych z serwera...</p>
+                <div class="loader__bar"><span></span></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ----------------------------------------- detail panel -->
+          <section class="panel panel--detail" id="detail" aria-label="Szczegóły zgłoszenia"></section>
+
+        </div>
+      </section>
+
+      <!-- =============================================== module: Pulpit -->
+      <section class="module" id="module-pulpit" hidden>
+        <p class="breadcrumb"><span>Pulpit</span></p>
+        <div class="pagehead"><h1>Pulpit</h1>
+          <p class="pagehead__meta">stan kolejki na dziś</p>
+        </div>
+        <div class="dash" id="dash"></div>
+      </section>
+
+      <!-- ================================== module: placeholder modules -->
+      <section class="module" id="module-stub" hidden>
+        <p class="breadcrumb"><a href="#" data-module="pulpit">Pulpit</a> <span aria-hidden="true">&gt;</span> <span id="stub-crumb"></span></p>
+        <div class="pagehead"><h1 id="stub-title"></h1></div>
+        <div class="stub">
+          <p class="stub__title">Moduł niedostępny w wersji demonstracyjnej</p>
+          <p>Ten obszar konsoli nie wchodzi w zakres zadania. Zaimplementowany jest wyłącznie moduł
+            <a href="#" data-module="zgloszenia">Zgłoszenia</a>.</p>
+          <p class="stub__code">RELAY-DEMO-0x0002 · brak uprawnień do modułu w profilu k.nowak</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================================================== chrome -->
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal__window" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__bar"><span id="modal-title"></span><button type="button" class="modal__x" data-modal="cancel" aria-label="Zamknij">✕</button></div>
+    <div class="modal__body" id="modal-body"></div>
+    <div class="modal__actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<noscript>
+  <p style="padding:16px;font:11px Inter,sans-serif">
+    Ten ekran jest interaktywnym prototypem i wymaga włączonego JavaScriptu.
+  </p>
+</noscript>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
